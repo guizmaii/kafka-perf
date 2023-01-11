@@ -2,7 +2,7 @@ object Common {
   val messages = 1_000_000
 
   val config = Map(
-    "bootstrap.servers" -> "kafka.docker:9092",
+    "bootstrap.servers" -> "localhost:9092",
     "compression.type" -> "zstd",
     "batch.size" -> "200000",
     "linger.ms" -> "5",

@@ -11,12 +11,12 @@ object ZIOKafkaPerf extends ZIOAppDefault {
       val message = new ProducerRecord[Array[Byte], Array[Byte]]("escape.heartbeat", "test message".getBytes)
       val publish: Task[List[Task[RecordMetadata]]] = ZIO.foreach((1 to messages).toList) { _ => producer.produceAsync(message, Serde.byteArray, Serde.byteArray) }
       val wait: Task[List[RecordMetadata]] = publish.flatMap(jobs => ZIO.foreach(jobs)(identity))
-      val job1 = wait.timed.flatMap(result => zio.Console.printLine(s"Took unchunked ${result._1.toMillis}"))
+      val job1 = wait.timed.flatMap(result => zio.Console.printLine(s"Took unchunked ${result._1.toMillis}ms"))
 
       val chunks: Chunk[ProducerRecord[Array[Byte], Array[Byte]]] = Chunk.fill(messages)(message)
       val bulkPublish = producer.produceChunkAsync(chunks, Serde.byteArray, Serde.byteArray)
       val bulkWait = bulkPublish.flatten
-      val job2 = bulkWait.timed.flatMap(result => zio.Console.printLine(s"Took chunked ${result._1.toMillis}"))
+      val job2 = bulkWait.timed.flatMap(result => zio.Console.printLine(s"Took chunked ${result._1.toMillis}ms"))
       job2.repeatN(5).flatMap(_ => job1.repeatN(5))
     }
 
